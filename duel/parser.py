@@ -20,7 +20,7 @@ class QuestionParser:
         for i in range(total_questions):
             problem_lines = [line for line in self.parse_question(i)]
             answer = self.parse_answer(i).decode('utf-8')
-            question = Question('\n'.join(problem_lines).decode('utf-8'), answer, source)
+            question = Question('\n'.join(problem_lines[3:]).decode('utf-8'), answer, source)
             db.session.add(question)
 
         db.session.commit()

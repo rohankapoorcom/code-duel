@@ -6,7 +6,6 @@ from duel import db
 
 class Source(db.Model):
     """Represents a source of Questions"""
-
     __tablename__ = 'sources'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -18,7 +17,6 @@ class Source(db.Model):
 
 class Question(db.Model):
     """Represents a question/answer pair"""
-
     __tablename__ = 'questions'
 
     id = db.Column(db.Integer, primary_key=True)
