@@ -2,8 +2,8 @@
 Contains the database backed classes: Source, Question
 """
 
-from duel import db, bcrypt
-import datetime
+from duel import db, bcrypt, login_manager
+from datetime import datetime
 
 class Source(db.Model):
     """Represents a source of Questions"""
@@ -58,5 +58,26 @@ class User(db.Model):
         self.email = email
         self.registration_date = datetime.utcnow()
 
-    def check_password(password):
+    def check_password(self, password):
+        """Uses bcrypt to verify user's password"""
         return bcrypt.check_password_hash(self.password, password)
+
+    def is_authenticated(self):
+        """If we have a user object, they are authentication"""
+        return True
+ 
+    def is_active(self):
+        """If we have a user object, they are active"""
+        return True
+ 
+    def is_anonymous(self):
+        """If we have a user object, they are not anonymous"""
+        return False
+ 
+    def get_id(self):
+        """Returns the id as a unicode string of the current user"""
+        return unicode(self.id)
+ 
+    def __repr__(self):
+        """Allows a text based representation of the current user"""
+        return '<User {}>'.format(self.username)
