@@ -52,6 +52,7 @@ class User(db.Model):
     registration_date = db.Column(db.DateTime)
 
     def __init__(self, username, password, email):
+        """Initializes a new user, using bcrypt to hash their password"""
         self.username = username
         self.password = bcrypt.generate_password_hash(password)
         self.email = email
