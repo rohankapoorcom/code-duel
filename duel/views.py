@@ -43,3 +43,14 @@ def login():
 
     login_user(registered_user, remember=True)
     return json.dumps({'success': True})
+
+@app.route('/logout/')
+def logout():
+    """Handles user logout for Flask-Logout"""
+    logout_user()
+    return json.dumps({'success': True})
+
+@app.route('/begin/')
+def begin():
+    """Starts Matchmaking for the duel"""
+    return ""
