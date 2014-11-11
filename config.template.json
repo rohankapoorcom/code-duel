@@ -1,0 +1,11 @@
+{
+    "environment": "development",
+
+    "development": {
+        "app": {
+        	"port": 5000,
+        	"host": "0.0.0.0",
+            "secret_key": "THIS_IS_A_SECRET"
+    	}
+    }
+}

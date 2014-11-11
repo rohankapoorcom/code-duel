@@ -11,7 +11,7 @@ from flask_util_js import FlaskUtilJs
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///..\\data\\test.db'
-app.secret_key = 'THIS_IS_A_SECRET'
+config = {}
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
