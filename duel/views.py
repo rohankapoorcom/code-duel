@@ -1,6 +1,6 @@
 from duel import app, db
 from models import Question, User
-from flask import render_template, request, flash, redirect, url_for, session, abort
+from flask import render_template, request, redirect, url_for, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 
 
@@ -9,7 +9,7 @@ import json
 @app.route('/')
 def home():
     """Renders the Homepage"""
-    return 'Welcome to Code Duel'
+    return render_template('base.html', user=current_user)
 
 @app.route('/question/<id>/')
 def question(id):
@@ -17,33 +17,29 @@ def question(id):
     question = Question.query.filter_by(id=id).first_or_404()
     return json.dumps(question.to_dict())
 
-@app.route('/register/' , methods=['GET','POST'])
+@app.route('/register/', methods=['POST'])
 def register():
     """Handles user registration for Flask-Login"""
-    if request.method == 'GET':
-        return render_template('register.html')
-    user = User(request.form['username'], request.form['password'], request.form['email'])
+    email = request.form['email']
+    registered_user = User.query.filter_by(email=email).first()
+    if registered_user:
+        return json.dumps({'success': False})
+    user = User(email.split('@')[0], request.form['password'], email)
     db.session.add(user)
     db.session.commit()
-    print('User successfully registered')
-    return redirect(url_for('login'))
+    return json.dumps({'success': True})
  
-@app.route('/login/',methods=['GET','POST'])
+@app.route('/login/',methods=['POST'])
 def login():
     """Handles user login for Flask-Login"""
-    if request.method == 'GET':
-        return render_template('login.html')
-    username = request.form['username']
+    email = request.form['email']
     password = request.form['password']
-    registered_user = User.query.filter_by(username=username).first()
+    registered_user = User.query.filter_by(email=email).first()
     if registered_user is None:
-        print('Username is invalid' , 'error')
-        return redirect(url_for('login'))
+        return json.dumps({'success': False})
 
     if not registered_user.check_password(password):
-        print('password is invalid' , 'error')
-        return redirect(url_for('login'))        
+        return json.dumps({'success': False})    
 
-    login_user(registered_user)
-    print('Logged in successfully')
-    return redirect(request.args.get('next') or url_for('home'))
+    login_user(registered_user, remember=True)
+    return json.dumps({'success': True})

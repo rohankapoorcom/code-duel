@@ -4,6 +4,7 @@ Contains the database backed classes: Source, Question
 
 from duel import db, bcrypt, login_manager
 from datetime import datetime
+from flask_login import make_secure_token
 
 class Source(db.Model):
     """Represents a source of Questions"""
@@ -46,10 +47,11 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120), unique=True, index=True)
+    username = db.Column(db.String(120))
     password = db.Column(db.String(60))
     email = db.Column(db.String(120), unique=True, index=True)
     registration_date = db.Column(db.DateTime)
+    authentication_token = db.Column(db.String(120))
 
     def __init__(self, username, password, email):
         """Initializes a new user, using bcrypt to hash their password"""
@@ -57,6 +59,7 @@ class User(db.Model):
         self.password = bcrypt.generate_password_hash(password)
         self.email = email
         self.registration_date = datetime.utcnow()
+        self.authentication_token = make_secure_token(self.email, self.password)
 
     def check_password(self, password):
         """Uses bcrypt to verify user's password"""
@@ -77,6 +80,10 @@ class User(db.Model):
     def get_id(self):
         """Returns the id as a unicode string of the current user"""
         return unicode(self.id)
+
+    def get_auth_token(self):
+        """Returns an authentication toekn used to identify this user"""
+        return self.authentication_token
  
     def __repr__(self):
         """Allows a text based representation of the current user"""
