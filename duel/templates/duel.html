@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-1">
+      </div>
+      <div class="col-md-10">
+        {% for line in lines %}
+          <p>{{ line }}</p>
+        {% endfor %}
+      </div>
+      <div class="col-md-8">
+      </div>
+    </div>
+    <textarea id="code" name="code"></textarea>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function() {
+      var codeMirror = CodeMirror.fromTextArea(document.getElementById('code'),
+        {
+          lineNumbers: true
+        });
+    });
+  </script>
+{% endblock %}

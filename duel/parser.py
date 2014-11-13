@@ -3,7 +3,7 @@ Contains the QuestionParser class which loads in all of the Project Euler data
 """
 
 from duel import db
-from models import Source, Question
+from duel.models import Source, Question
 
 import linecache
 

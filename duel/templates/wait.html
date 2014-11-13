@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <h3>MatchMaking in Progress, Please Wait...</h3>
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 100%;">
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    $(document).ready(function() {
+      // Check if server is ready, then reload page
+    });
+  </script>
+{% endblock %}

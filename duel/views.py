@@ -1,15 +1,18 @@
 from duel import app, db
-from models import Question, User
+from duel.models import Question, User
+from duel.functions import get_random_question
+
 from flask import render_template, request, redirect, url_for, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 
+import duel
 
 import json
 
 @app.route('/')
 def home():
     """Renders the Homepage"""
-    return render_template('base.html', user=current_user)
+    return render_template('base.html')
 
 @app.route('/question/<id>/')
 def question(id):
@@ -51,6 +54,15 @@ def logout():
     return json.dumps({'success': True})
 
 @app.route('/begin/')
+@login_required
 def begin():
     """Starts Matchmaking for the duel"""
-    return ""
+    duel.user_queue.add_user(current_user)
+    if not duel.user_queue.ready_to_play():
+        return render_template('wait.html')
+
+    question = get_random_question()
+    lines = question.question.split('\n')
+    print(question)
+    print(lines)
+    return render_template('duel.html', lines=lines)

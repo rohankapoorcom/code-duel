@@ -17,6 +17,9 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 fujs = FlaskUtilJs(app)
 
+from duel.functions import UserQueue
+user_queue = UserQueue()
+
 import os
 from parser import QuestionParser
 
@@ -34,6 +37,6 @@ if not os.path.isfile(get_data_path('test.db')):
 
 import duel.views
 
-login_manager.login_view = 'login'
+login_manager.login_view = 'home'
 
 import duel.functions

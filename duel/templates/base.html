@@ -16,6 +16,7 @@
 
     <!-- Custom styles for this template -->
     <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/codemirror.css') }}" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -25,7 +26,6 @@
   </head>
 
   <body>
-
     <nav id="navbar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
@@ -41,7 +41,7 @@
           <div class="navbar-inner">
             <ul class="nav navbar-nav navbar-right">
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><strong>{{ user.username }}</strong><span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><strong>{{ current_user.username }}</strong><span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li><a href="#action=logout" onclick="logout()">Logout</a></li>
                 </ul>
@@ -62,94 +62,99 @@
       </div>
     </nav>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <div class="text-center">
-          <h1>Welcome to Code Duel!</h1>
-          <p>Code Duel is an interactive coding duel system. We have a unique 3 step process to make your duels painless! All duels must be held in Python - due to system limitations.</p>
-          <div class="row">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6" id="registration">
-              {% if current_user.is_authenticated() %}
-              <a class="btn btn-primary btn-lg" role="button" href="{{ url_for('begin') }}">Begin Duel &raquo;</a>
-              {% else %}
-                <div class="alert-location"></div>
-                <form class="form-horizontal" role="form" id="registrationForm" data-bv-onsuccess="processRegistrationForm" method="post" action="#">
-                  <div class="form-group">
-                    <label for="email" class="col-sm-2 control-label">Email</label>
-                    <div class="col-sm-10">
-                      <input type="email" class="form-control" id="email" name="email" placeholder="me@example.com" required />
+    {% block content %}
+      <div class="jumbotron">
+        <div class="container">
+          <div class="text-center">
+            <h1>Welcome to Code Duel!</h1>
+            <p>Code Duel is an interactive coding duel system. We have a unique 3 step process to make your duels painless! All duels must be held in Python - due to system limitations.</p>
+            <div class="row">
+              <div class="col-sm-3"></div>
+              <div class="col-sm-6" id="registration">
+                {% if current_user.is_authenticated() %}
+                <a class="btn btn-primary btn-lg" role="button" href="{{ url_for('begin') }}">Begin Duel &raquo;</a>
+                {% else %}
+                  <div class="alert-location"></div>
+                  <form class="form-horizontal" role="form" id="registrationForm" data-bv-onsuccess="processRegistrationForm" method="post" action="#">
+                    <div class="form-group">
+                      <label for="email" class="col-sm-2 control-label">Email</label>
+                      <div class="col-sm-10">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="me@example.com" required />
+                      </div>
                     </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="password" class="col-sm-2 control-label">Password</label>
-                    <div class="col-sm-10">
-                      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="8" data-bv-notempty-message="The password is required" data-bv-stringlength-message="The password must be at least 8 characters" />
+                    <div class="form-group">
+                      <label for="password" class="col-sm-2 control-label">Password</label>
+                      <div class="col-sm-10">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="8" data-bv-notempty-message="The password is required" data-bv-stringlength-message="The password must be at least 8 characters" />
+                      </div>
                     </div>
-                  </div>
-                  <input type="submit" class="btn btn-primary btn-lg" role="button" value="Register &raquo;"></input>
-                </form>
-              {% endif %}
+                    <input type="submit" class="btn btn-primary btn-lg" role="button" value="Register &raquo;"></input>
+                  </form>
+                {% endif %}
+              </div>
+              <div class="col-sm-3"></div>
             </div>
-            <div class="col-sm-3"></div>
+            <div class="col-sm-4"></div>
           </div>
-          <div class="col-sm-4"></div>
         </div>
       </div>
-    </div>
 
-    <div class="container">
-      <!-- Example row of columns -->
-      <div class="row">
-        <div class="col-md-4">
-          <div class="text-center">
-            <h2>&laquo; Login &raquo;</h2>
+      <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+          <div class="col-md-4">
+            <div class="text-center">
+              <h2>&laquo; Login &raquo;</h2>
+            </div>
+            <p>Once you login to Code Duel, you'll automatically be placed in a queue with other users.</p>
           </div>
-          <p>Once you login to Code Duel, you'll automatically be placed in a queue with other users.</p>
+          <div class="col-md-4">
+            <div class="text-center">
+              <h2>&laquo; Match Up &raquo;</h2>
+            </div>
+            <p>Our system will automatically (read randomly) pick another user to match you with.</p>
+         </div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <h2>&laquo; Duel &raquo;</h2>
+            </div>
+            <p>Choose the number of questions you want to solve during this duel and after a five second count down, the duel will begin. You'll get feedback after you submit your code for each problem and there will be a score assigned based on the number of tries it took you to solve the question and the total time during the round.</p>
+          </div>
         </div>
-        <div class="col-md-4">
-          <div class="text-center">
-            <h2>&laquo; Match Up &raquo;</h2>
+        <div class="row">
+          <div class="col-md-4"></div>
+          <div class="col-md-4">
+            <div class="text-center">
+              <h2>&laquo; Win &raquo;</h2>
+            </div>
+            <p>The user with the most points at the end of the duel wins!</p>
           </div>
-          <p>Our system will automatically (read randomly) pick another user to match you with.</p>
-       </div>
-        <div class="col-md-4">
-          <div class="text-center">
-            <h2>&laquo; Duel &raquo;</h2>
-          </div>
-          <p>Choose the number of questions you want to solve during this duel and after a five second count down, the duel will begin. You'll get feedback after you submit your code for each problem and there will be a score assigned based on the number of tries it took you to solve the question and the total time during the round.</p>
+          <div class="col-md-4"></div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4">
-          <div class="text-center">
-            <h2>&laquo; Win &raquo;</h2>
-          </div>
-          <p>The user with the most points at the end of the duel wins!</p>
-        </div>
-        <div class="col-md-4"></div>
-      </div>
-
-      <hr>
-
-      <footer>
+      </div> <!-- /container -->
+    {% endblock %}
+    
+    <footer class="footer">
+      <div class="container">
         <p>&copy; Rohan Kapoor 2014</p>
-      </footer>
-    </div> <!-- /container -->
+      </div>
+    </footer>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="{{ url_for('static', filename='js/bootstrapValidator.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/codemirror.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/mode/python/python.js') }}"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
     {{ flask_util_js.js }}
-    <script>
-      $(document).ready(function() {
-        validateRegistrationForm();
-      });
-    </script>
+    {% block scripts %}
+      <script>
+        $(document).ready(function() {
+          validateRegistrationForm();
+        });
+      </script>
+    {% endblock %}
   </body>
 </html>

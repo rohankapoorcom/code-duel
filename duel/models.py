@@ -2,7 +2,7 @@
 Contains the database backed classes: Source, Question
 """
 
-from duel import db, bcrypt, login_manager
+from duel import db, bcrypt
 from datetime import datetime
 from flask_login import make_secure_token
 
@@ -87,4 +87,4 @@ class User(db.Model):
  
     def __repr__(self):
         """Allows a text based representation of the current user"""
-        return '<User {}>'.format(self.username)
+        return '<User {}>'.format(self.email)
