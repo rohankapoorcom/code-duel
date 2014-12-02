@@ -6,6 +6,7 @@ from duel import login_manager, db
 from duel.models import User, Question
 
 import random
+import hashlib
 
 @login_manager.user_loader
 def load_user(id):
@@ -34,9 +35,8 @@ class UserQueue:
 
     def add_user(self, user):
         """Adds a user to the end of the queue"""
-        if user.id in self.queue:
-            return
-        self.queue.append(user.id)
+        if not user.id in self.queue:
+            self.queue.append(user.id)
 
     def ready_to_play(self):
         """Check's if there are at least 2 users in the queue"""
@@ -48,3 +48,37 @@ class UserQueue:
         user_2 = self.queue.pop(random.randrange(len(self.queue)))
         
         return user_1, user_2
+
+class SessionHandler:
+    """
+    A system that holds a series of sessions containing two users
+    and the question they are trying to solve
+    """
+
+    def __init__(self):
+        """Constructs a SessionHandler object"""
+        self.sessions = {}
+
+    def add_session(self, user_1, user_2, question_id):
+        """
+        Adds a new session to the dictionary of sessions (keyed by session_id)
+        """
+        session_id = hashlib.md5('{},{},{}'.format(user_1, user_2, question_id)).hexdigest()
+        self.sessions[session_id] = {
+            'user_1': user_1,
+            'user_2': user_2,
+            'question_id': question_id,
+            'session_id': session_id
+        }
+        return self.sessions[session_id]
+
+    def get_session_by_id(self, session_id):
+        """Returns the session corresponding to the session_id"""
+        return self.sessions.get(session_id, None)
+
+    def get_session_by_user_id(self, user_id):
+        """Returns the session corresponding to the user_id"""
+        for session in self.sessions.values():
+            if session['user_1'] == user_id or session['user_2'] == user_id:
+                return session
+        return None

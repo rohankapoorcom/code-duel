@@ -15,6 +15,9 @@
   <script>
     $(document).ready(function() {
       // Check if server is ready, then reload page
+      setTimeout(function() {
+        window.location.reload(1);
+      }, 5000);
     });
   </script>
 {% endblock %}
