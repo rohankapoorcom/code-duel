@@ -4,7 +4,7 @@ This has to be run from one level outside the package
 """
 import json
 
-from duel import app
+from duel import app, socketio
 
 import duel
 
@@ -28,7 +28,10 @@ def main():
 
     duel.config = config
     app.secret_key = config['secret_key']
-    app.run(**config['app'])
+    app.config['debug'] = config['debug']
+    socketio.run(app, **config['app'])
 
 if __name__ == '__main__':
+    from gevent import monkey
+    monkey.patch_all()
     main()

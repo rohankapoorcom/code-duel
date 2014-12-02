@@ -7,7 +7,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
-from flask_util_js import FlaskUtilJs 
+from flask_util_js import FlaskUtilJs
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///..\\data\\test.db'
@@ -16,9 +17,11 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 fujs = FlaskUtilJs(app)
+socketio = SocketIO(app)
 
-from duel.functions import UserQueue
+from duel.functions import UserQueue, SessionHandler
 user_queue = UserQueue()
+duel_sessions = SessionHandler()
 
 import os
 from parser import QuestionParser
