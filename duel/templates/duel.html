@@ -6,13 +6,20 @@
       <div class="col-md-1">
       </div>
       <div class="col-md-10">
+        <div class="text-center">
+          <h3>Your Question</h3>
+        </div>
         {% for line in lines %}
           <p>{{ line }}</p>
         {% endfor %}
+        <div class="text-center">
+          <h4>For grading, you must print your answer by itself on a single line</h4>
+        </div>
       </div>
       <div class="col-md-8">
       </div>
     </div>
+    <div id="placeholder"> </div>
     <textarea id="code" name="code"></textarea>
     <div class="text-center">
       <input type="hidden" id="duel_session_id" name="duel_session_id" value="{{ duel_session_id }}" />
