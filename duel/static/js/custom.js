@@ -68,3 +68,32 @@ function logout() {
       $('#registration').load(location.href + ' #registration > *');
   });
 }
+
+function setupSocketIO() {
+  socket = io.connect('http://' + document.domain + ':' + location.port);
+  socket.on('graded_code', function(msg) {
+    if (msg['correct']) {
+      banner = "<div class='alert alert-success alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Your Message was Successfully Changed!</div>";
+    }
+    else {
+      banner = "<div class='alert alert-danger alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Your Message was too Long. Change it, then try Again!</div>";
+    }
+    $('#placeholder').html(banner);
+    
+    window.setTimeout(function() {
+          $('.alert').alert('close');
+        }, 3000);
+  });
+}
+
+function submitCode() {
+  socket.emit(
+    'submit_code',
+    {
+      'code': codeMirror.getValue(),
+      'question_id': $('#question_id').val(),
+      'user_id': $('#user_id').val(),
+      'session_id': $('#duel_session_id').val()
+    }
+  );
+}

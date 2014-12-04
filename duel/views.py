@@ -70,7 +70,7 @@ def begin():
 
             # Build duel_session using match made
             duel_session = duel.duel_sessions.add_session(cur_users[0], cur_users[1], get_random_question().id)
-            
+
         # Set cookie with the new duel_session
         response = make_response(redirect(url_for('begin')))
         response.set_cookie('duel_session', duel_session['session_id'])
@@ -87,4 +87,10 @@ def begin():
     question = Question.query.filter_by(id=duel_session['question_id']).first()
     lines = question.question.split('\n')
 
-    return render_template('duel.html', lines=lines)
+    return render_template(
+        'duel.html',
+        lines=lines,
+        user_id = current_user.id,
+        question_id = duel_session['question_id'],
+        duel_session_id = duel_session['session_id']
+    )

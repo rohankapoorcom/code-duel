@@ -14,6 +14,12 @@
       </div>
     </div>
     <textarea id="code" name="code"></textarea>
+    <div class="text-center">
+      <input type="hidden" id="duel_session_id" name="duel_session_id" value="{{ duel_session_id }}" />
+      <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}" />
+      <input type="hidden" id="question_id" name="question_id" value="{{ question_id }}" />
+      <input value="Submit" class="btn btn-success thin-top-margin" onclick="submitCode()" readonly />
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -21,10 +27,11 @@
 {% block scripts %}
   <script>
     $(document).ready(function() {
-      var codeMirror = CodeMirror.fromTextArea(document.getElementById('code'),
+      codeMirror = CodeMirror.fromTextArea(document.getElementById('code'),
         {
           lineNumbers: true
         });
+      setupSocketIO();
     });
   </script>
 {% endblock %}

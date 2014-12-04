@@ -3,6 +3,7 @@ External endpoint to the duel package.
 This has to be run from one level outside the package
 """
 import json
+import docker
 
 from duel import app, socketio
 
@@ -27,8 +28,10 @@ def main():
         exit('Missing configuration in config.json')
 
     duel.config = config
+
+    duel.docker_client = docker.Client(**config['docker'])
     app.secret_key = config['secret_key']
-    app.config['debug'] = config['debug']
+    app.debug = config['debug']
     socketio.run(app, **config['app'])
 
 if __name__ == '__main__':

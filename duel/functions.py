@@ -2,8 +2,12 @@
 Contains additional functions and classes needed for Code Duel
 """
 
-from duel import login_manager, db
+from duel import login_manager, db, socketio
 from duel.models import User, Question
+
+import duel
+
+from flask_socketio import emit
 
 import random
 import hashlib
@@ -22,6 +26,10 @@ def get_random_question():
     """Pulls a random question from the Database"""
     rand = random.randrange(0, db.session.query(Question).count())
     return db.session.query(Question)[rand]
+
+def get_answer_to_question(question_id):
+    """Returns the answer to a specified question_id"""
+    return Question.query.filter_by(id=question_id).first_or_404().answer
 
 class UserQueue:
     """
@@ -82,3 +90,32 @@ class SessionHandler:
             if session['user_1'] == user_id or session['user_2'] == user_id:
                 return session
         return None
+
+def compile_code(code):
+    code = code.replace('"', '\\"')
+    command='python -c "{}"'.format(code)
+    contain = duel.docker_client.create_container(image='python', command=command)
+    duel.docker_client.start(contain.get('Id'))
+    duel.docker_client.wait(contain.get('Id'))
+    return duel.docker_client.logs(contain.get('Id')).rstrip()
+
+def grade_submission(submission, answer):
+    print('submission: {}'.format(submission))
+    print('answer: {}'.format(answer))
+    return submission == answer
+
+@socketio.on('submit_code')
+def code_submission(data):
+    code = data.get('code', '')
+    question_id = data.get('question_id')
+    user_id = data.get('user_id')
+    session_id = data.get('session_id')
+
+    # spawn docker instance
+    submission = compile_code(code)
+    correctness = grade_submission(
+        submission=compile_code(code),
+        answer=get_answer_to_question(question_id)
+    )
+    
+    emit('graded_code', {'correct': correctness })

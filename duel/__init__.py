@@ -18,6 +18,7 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 fujs = FlaskUtilJs(app)
 socketio = SocketIO(app)
+docker_client = None
 
 from duel.functions import UserQueue, SessionHandler
 user_queue = UserQueue()

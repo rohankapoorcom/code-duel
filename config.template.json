@@ -6,6 +6,9 @@
         	"port": 5000,
         	"host": "0.0.0.0"
     	},
+    	"docker": {
+    		"base_url": "tcp://DOCKER_HOST:2375"
+    	},
         "debug": true,
         "secret_key": "THIS_IS_A_SECRET"
     }
