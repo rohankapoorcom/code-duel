@@ -35,6 +35,10 @@ def main():
     socketio.run(app, **config['app'])
 
 if __name__ == '__main__':
+    """
+    Monkey patch's all functions before launching to allow for
+    proper async via gevent
+    """
     from gevent import monkey
     monkey.patch_all()
     main()

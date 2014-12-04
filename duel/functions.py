@@ -67,14 +67,14 @@ class SessionHandler:
         """Constructs a SessionHandler object"""
         self.sessions = {}
 
-    def add_session(self, user_1, user_2, question_id):
+    def add_session(self, user_1_id, user_2_id, question_id):
         """
         Adds a new session to the dictionary of sessions (keyed by session_id)
         """
-        session_id = hashlib.md5('{},{},{}'.format(user_1, user_2, question_id)).hexdigest()
+        session_id = hashlib.md5('{},{},{}'.format(user_1_id, user_2_id, question_id)).hexdigest()
         self.sessions[session_id] = {
-            'user_1': user_1,
-            'user_2': user_2,
+            'user_1_id': user_1_id,
+            'user_2_id': user_2_id,
             'question_id': question_id,
             'session_id': session_id
         }
@@ -87,11 +87,16 @@ class SessionHandler:
     def get_session_by_user_id(self, user_id):
         """Returns the session corresponding to the user_id"""
         for session in self.sessions.values():
-            if session['user_1'] == user_id or session['user_2'] == user_id:
+            if session['user_1_id'] == user_id or session['user_2_id'] == user_id:
                 return session
         return None
 
 def compile_code(docker_client, code):
+    """
+    Sanitizes strings and executes code in an isolated docker instance on a
+    separate docker server. Once the code has finished executing, the docker
+    instance returns stdout and exits cleanly.
+    """
     code = code.replace('"', '\\"')
     command='python -c "{}"'.format(code)
     contain = docker_client.create_container(image='python', command=command)
@@ -100,19 +105,30 @@ def compile_code(docker_client, code):
     return docker_client.logs(contain.get('Id')).rstrip()
 
 def grade_submission(submission, answer):
+    """Verifies that the value computed equals the correct answer"""
     return submission == answer
 
 @socketio.on('submit_code')
 def code_submission(data):
+    """
+    Receives the socketio event for code submission, passes on the data
+    to the executing and grading functions and sends the response back
+    to all connected clients
+    """
     code = data.get('code', '')
     question_id = data.get('question_id')
     user_id = data.get('user_id')
     session_id = data.get('session_id')
 
-    # spawn docker instance
     correctness = grade_submission(
         submission=compile_code(duel.docker_client, code),
         answer=get_answer_to_question(question_id)
     )
     
-    emit('graded_code', {'correct': correctness })
+    socketio.emit('graded_code',
+        {
+            'correct': correctness,
+            'session_id': session_id,
+            'user_id': user_id
+        }
+    )

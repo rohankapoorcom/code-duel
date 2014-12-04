@@ -1,3 +1,6 @@
+/*
+ * AJAX submit the registration form
+ */
 function processRegistrationForm(e) {
   e.preventDefault();
   var $form = $('#registrationForm'),
@@ -22,6 +25,9 @@ function processRegistrationForm(e) {
   });
 }
 
+/*
+ * AJAX submit the login form
+ */
 function processLoginForm() {
   var $form = $('#loginForm'),
     url = flask_util.url_for('login');
@@ -48,6 +54,9 @@ function processLoginForm() {
   return false;
 }
 
+/*
+ * Call bootstrapValidator on the registration form
+ */
 function validateRegistrationForm() {
   $('#registrationForm').bootstrapValidator({
       feedbackIcons: {
@@ -58,6 +67,9 @@ function validateRegistrationForm() {
   });
 }
 
+/*
+ * AJAX logout the current user
+ */
 function logout() {
   var getting = $.get(flask_util.url_for('logout'));
   
@@ -69,23 +81,49 @@ function logout() {
   });
 }
 
+/*
+ * Setup a SocketIO connection to the server and respond to messages
+ */
 function setupSocketIO() {
   socket = io.connect('http://' + document.domain + ':' + location.port);
+  socket.emit('connect', '');
   socket.on('graded_code', function(msg) {
-    if (msg['correct']) {
-      banner = "<div class='alert alert-success alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Your Message was Successfully Changed!</div>";
+    if (msg['session_id'] != $('#duel_session_id').val()) {
+      console.log('ignoring');
+      return;
     }
+
+    if (msg['user_id'] != $('#user_id').val()) {
+      // Inform the user that the opponent won
+      console.log('user_id not equal');
+      if (msg['correct']) {
+        banner = "<div class='alert alert-danger alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>You Lose, your opponent submitted the correct answer!</div>";
+      }
+      else
+        return;
+    }
+
     else {
-      banner = "<div class='alert alert-danger alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Your Message was too Long. Change it, then try Again!</div>";
+      // Inform the user that they won
+      if (msg['correct']) {
+        banner = "<div class='alert alert-success alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>You Win, you submitted the correct answer!</div>";
+      }
+
+      else {
+        banner = "<div class='alert alert-danger alert-dismissable fade in' role='alert'><button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>Your Code Didn't Work. Change it, then try Again!</div>";
+      }
     }
     $('#placeholder').html(banner);
     
     window.setTimeout(function() {
           $('.alert').alert('close');
-        }, 3000);
+        }, 5000);
   });
 }
 
+/*
+ * Use SocketIO to submit the code for grading
+ */
 function submitCode() {
   socket.emit(
     'submit_code',
