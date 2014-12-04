@@ -13,7 +13,7 @@ An interactive code duel system. Login - Match Up - Duel!
 
 ### Testing
 ---------------
-
+Run `nosetests -v` from the main directory to run all of the unit tests
 
 ### Resources
 ---------------

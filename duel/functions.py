@@ -91,17 +91,15 @@ class SessionHandler:
                 return session
         return None
 
-def compile_code(code):
+def compile_code(docker_client, code):
     code = code.replace('"', '\\"')
     command='python -c "{}"'.format(code)
-    contain = duel.docker_client.create_container(image='python', command=command)
-    duel.docker_client.start(contain.get('Id'))
-    duel.docker_client.wait(contain.get('Id'))
-    return duel.docker_client.logs(contain.get('Id')).rstrip()
+    contain = docker_client.create_container(image='python', command=command)
+    docker_client.start(contain.get('Id'))
+    docker_client.wait(contain.get('Id'))
+    return docker_client.logs(contain.get('Id')).rstrip()
 
 def grade_submission(submission, answer):
-    print('submission: {}'.format(submission))
-    print('answer: {}'.format(answer))
     return submission == answer
 
 @socketio.on('submit_code')
@@ -112,9 +110,8 @@ def code_submission(data):
     session_id = data.get('session_id')
 
     # spawn docker instance
-    submission = compile_code(code)
     correctness = grade_submission(
-        submission=compile_code(code),
+        submission=compile_code(duel.docker_client, code),
         answer=get_answer_to_question(question_id)
     )
     
